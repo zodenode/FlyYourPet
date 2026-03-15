@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const isGhPages = process.env.GITHUB_PAGES === "1";
-const basePath = isGhPages ? "/flymypet" : "";
+const basePath = isGhPages ? "/FlyYourPet" : "";
 
 // Expose basePath for client-side asset URLs (e.g. public folder images)
 if (isGhPages) {

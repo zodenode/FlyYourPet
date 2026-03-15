@@ -283,7 +283,7 @@ The marketing site (landing, how-it-works, pricing, rescue, requirements) can be
 
 1. **Enable GitHub Pages** in repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 2. Push to `main` (or `master`). The `.github/workflows/deploy-gh-pages.yml` workflow builds and deploys automatically.
-3. Site will be live at `https://<username>.github.io/flymypet/`.
+3. Site will be live at `https://zodenode.github.io/FlyYourPet/`.
 
 **Build locally:**
 ```bash
@@ -291,7 +291,7 @@ npm run build:static
 # Output in ./out — deploy to any static host
 ```
 
-**If your repo has a different name:** Update `basePath` in `next.config.ts` (e.g. `"/your-repo-name"`).
+**If your repo has a different name:** Update `basePath` in `next.config.ts` to match (e.g. `"/FlyYourPet"`).
 
 *Note: API routes and admin panel are excluded from the static build. Use Vercel or similar for the full app with the bot webhook.*
 
