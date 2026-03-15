@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
@@ -17,11 +18,14 @@ import {
   ClipboardList,
   Clock,
   MapPin,
+  AlertTriangle,
 } from "lucide-react";
 import { ScrollMarquee } from "@/components/ScrollMarquee";
+import { StickyCTA } from "@/components/StickyCTA";
 
 const TELEGRAM_BOT_URL =
   process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/FlyMyPetBot";
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
@@ -206,6 +210,7 @@ const IMPORT_EXPORT_STEPS = {
   ],
 };
 
+// Expat-first order for conversion
 const TESTIMONIALS = [
   {
     name: "Sarah K.",
@@ -224,20 +229,20 @@ const TESTIMONIALS = [
     date: "January 2026",
   },
   {
-    name: "Olga M.",
-    location: "Dubai \u2192 Bucharest",
-    pet: "Simba & Nala (Rescue Cats)",
-    rating: 5,
-    text: "I adopted two street cats from Ras Al Khaimah and needed them in Romania. The rescue sponsorship rate was incredibly fair, and a flight buddy carried them in-cabin. Both cats adjusted beautifully to their new home.",
-    date: "December 2025",
-  },
-  {
     name: "Tom W.",
     location: "Dubai \u2192 Porto",
     pet: "Biscuit (British Shorthair)",
     rating: 5,
     text: "The document review process alone saved me weeks of confusion. They caught a date error on my vaccination record that would have caused rejection at the border. Biscuit and I are happily settled in Porto now.",
     date: "November 2025",
+  },
+  {
+    name: "Olga M.",
+    location: "Dubai \u2192 Bucharest",
+    pet: "Simba & Nala (Rescue Cats)",
+    rating: 5,
+    text: "I adopted two street cats from Ras Al Khaimah and needed them in Romania. The rescue sponsorship rate was incredibly fair, and a flight buddy carried them in-cabin. Both cats adjusted beautifully to their new home.",
+    date: "December 2025",
   },
 ];
 
@@ -300,6 +305,12 @@ export default function FlyMyPetLanding() {
           </div>
           <div className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
             <a
+              href="#crisis"
+              className="hover:text-sky-600 transition-colors"
+            >
+              GCC Crisis
+            </a>
+            <a
               href="#how-it-works"
               className="hover:text-sky-600 transition-colors"
             >
@@ -360,16 +371,21 @@ export default function FlyMyPetLanding() {
             variants={fadeIn}
             className="text-5xl md:text-6xl font-extrabold leading-tight text-slate-900"
           >
-            Move Your Pet From UAE To Europe{" "}
-            <span className="text-sky-500">Safely.</span>
+            Don&apos;t Leave Them Behind
           </motion.h1>
           <motion.p
             variants={fadeIn}
             className="text-lg text-slate-600 max-w-lg leading-relaxed"
           >
-            Expert guidance for UAE expats and rescue sponsors. Document-ready,
-            IATA compliant, and seamlessly managed through our Telegram
-            Concierge.
+            Moving from the UAE? Relocate your pet safely to Europe with expert
+            guidance. Document-ready, IATA compliant \u2014 all via Telegram.
+          </motion.p>
+          <motion.p
+            variants={fadeIn}
+            className="text-sm text-slate-500 italic max-w-md"
+          >
+            &ldquo;We had two weeks to leave. FlyMyPet made it possible.\u201d
+            \u2014 James &amp; Priya, Abu Dhabi \u2192 Madrid
           </motion.p>
           <motion.div
             variants={fadeIn}
@@ -384,13 +400,13 @@ export default function FlyMyPetLanding() {
               <Send size={20} />
               Start Pet Relocation
             </a>
-            <a
-              href="#pricing"
-              className="bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 px-8 py-4 rounded-full font-semibold flex justify-center items-center transition-all"
-            >
-              Get an Estimate
-            </a>
           </motion.div>
+          <motion.p
+            variants={fadeIn}
+            className="text-xs text-slate-500 pt-2"
+          >
+            IATA Compliant \u00B7 MOCCAE Partners \u00B7 EU Annex IV Certified
+          </motion.p>
         </motion.div>
 
         <motion.div
@@ -461,6 +477,123 @@ export default function FlyMyPetLanding() {
         </ScrollMarquee>
       </section>
 
+      {/* GCC CRISIS SECTION */}
+      <section id="crisis" className="py-16 md:py-24 bg-amber-50 border-b border-amber-200 px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="flex flex-col md:flex-row items-start gap-6 p-8 md:p-12 bg-white rounded-3xl border-2 border-amber-200 shadow-lg shadow-amber-500/5"
+          >
+            <div className="shrink-0">
+              <AlertTriangle size={48} className="text-amber-500" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+                This Isn&apos;t Normal
+              </h2>
+              <p className="text-slate-600 mb-4 leading-relaxed">
+                Pets are suffering across the Gulf. Families leaving the region
+                face impossible choices. Hundreds of abandoned animals have
+                adoptive homes waiting in Europe, but lack the means to get
+                there.
+              </p>
+              <p className="text-slate-700 font-medium mb-6">
+                We help expats relocate their pets and sponsors fund rescue
+                flights. Don&apos;t leave them behind.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href={TELEGRAM_BOT_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-full font-semibold transition-all"
+                >
+                  <Send size={18} />
+                  Start Relocation
+                </a>
+                <a
+                  href="#rescue"
+                  className="inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full font-semibold transition-all"
+                >
+                  <Heart size={18} />
+                  Sponsor a Rescue
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS — Moved before How It Works for expat conversion */}
+      <section id="testimonials" className="py-24 bg-white px-6">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Trusted by Pet Owners Across the UAE
+            </h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              Real stories from families who successfully relocated their pets
+              to Europe with our help.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 gap-8"
+          >
+            {TESTIMONIALS.map((t, i) => (
+              <motion.div
+                key={i}
+                variants={fadeIn}
+                className="bg-slate-50 rounded-3xl p-8 relative"
+              >
+                <Quote
+                  size={40}
+                  className="text-sky-100 absolute top-6 right-6"
+                />
+                <div className="flex gap-1 mb-4">
+                  {Array.from({ length: t.rating }).map((_, j) => (
+                    <Star
+                      key={j}
+                      size={16}
+                      className="fill-amber-400 text-amber-400"
+                    />
+                  ))}
+                </div>
+                <p className="text-slate-700 leading-relaxed mb-6 relative z-10">
+                  &ldquo;{t.text}&rdquo;
+                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-slate-900">{t.name}</p>
+                    <p className="text-sm text-slate-500">{t.pet}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-sky-600 flex items-center gap-1">
+                      <Plane size={14} />
+                      {t.location}
+                    </p>
+                    <p className="text-xs text-slate-400">{t.date}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section id="how-it-works" className="py-24 bg-white px-6">
         <div className="max-w-7xl mx-auto text-center">
@@ -497,75 +630,6 @@ export default function FlyMyPetLanding() {
               </motion.div>
             ))}
           </motion.div>
-        </div>
-      </section>
-
-      {/* MATRIX & AIRLINES */}
-      <section id="matrix" className="py-24 bg-slate-900 text-white px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-12 text-center md:text-left">
-            <h2 className="text-3xl font-bold mb-4">
-              Requirement &amp; Airline Matrix
-            </h2>
-            <p className="text-slate-400 max-w-2xl">
-              The UAE is considered an &ldquo;unlisted third country&rdquo; by
-              the EU. Strict timelines apply. Here is what you need to know.
-            </p>
-          </div>
-
-          <div className="bg-slate-800 rounded-3xl overflow-hidden shadow-2xl border border-slate-700">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-slate-800 border-b border-slate-700 text-slate-300">
-                  <tr>
-                    <th className="p-6 font-semibold">Destination</th>
-                    <th className="p-6 font-semibold">Microchip</th>
-                    <th className="p-6 font-semibold">Rabies Vacc.</th>
-                    <th className="p-6 font-semibold">RNATT (Titre Test)</th>
-                    <th className="p-6 font-semibold">Health Cert.</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-700">
-                  {MATRIX_ROWS.map((row, i) => (
-                    <tr
-                      key={i}
-                      className="hover:bg-slate-700/50 transition-colors"
-                    >
-                      <td className="p-6 font-medium">{row.country}</td>
-                      <td className="p-6 text-slate-400">{row.chip}</td>
-                      <td className="p-6 text-slate-400">{row.rabies}</td>
-                      <td className="p-6 text-slate-400">{row.titre}</td>
-                      <td className="p-6 text-slate-400">{row.cert}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="mt-12 flex justify-center">
-            <a
-              href="/requirements"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-full transition-all shadow-lg shadow-sky-500/30"
-            >
-              <Globe size={18} />
-              View Full 57+ Country Requirements
-            </a>
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {AIRLINES.map((airline) => (
-              <div
-                key={airline.name}
-                className="bg-slate-800 p-6 rounded-2xl border border-slate-700"
-              >
-                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
-                  {"\u2708\uFE0F"} {airline.name}
-                </h4>
-                <p className="text-sm text-slate-400">{airline.desc}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -710,10 +774,19 @@ export default function FlyMyPetLanding() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeIn}
-            className="text-3xl font-bold mb-16 text-center text-slate-900"
+            className="text-3xl font-bold mb-4 text-center text-slate-900"
           >
-            Transparent Pricing
+            Transparent Pricing for Expats
           </motion.h2>
+          <motion.p
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="text-slate-600 text-center mb-16 max-w-2xl mx-auto"
+          >
+            No surprises. Get a clear estimate for your relocation before you start.
+          </motion.p>
 
           <div className="grid md:grid-cols-3 gap-8">
             {PRICING_TIERS.map((tier, i) => (
@@ -766,6 +839,75 @@ export default function FlyMyPetLanding() {
         </div>
       </section>
 
+      {/* MATRIX & AIRLINES — Lower on page for expat conversion flow */}
+      <section id="matrix" className="py-24 bg-slate-900 text-white px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-12 text-center md:text-left">
+            <h2 className="text-3xl font-bold mb-4">
+              Requirement &amp; Airline Matrix
+            </h2>
+            <p className="text-slate-400 max-w-2xl">
+              The UAE is considered an &ldquo;unlisted third country&rdquo; by
+              the EU. Strict timelines apply. Here is what you need to know.
+            </p>
+          </div>
+
+          <div className="bg-slate-800 rounded-3xl overflow-hidden shadow-2xl border border-slate-700">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead className="bg-slate-800 border-b border-slate-700 text-slate-300">
+                  <tr>
+                    <th className="p-6 font-semibold">Destination</th>
+                    <th className="p-6 font-semibold">Microchip</th>
+                    <th className="p-6 font-semibold">Rabies Vacc.</th>
+                    <th className="p-6 font-semibold">RNATT (Titre Test)</th>
+                    <th className="p-6 font-semibold">Health Cert.</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700">
+                  {MATRIX_ROWS.map((row, i) => (
+                    <tr
+                      key={i}
+                      className="hover:bg-slate-700/50 transition-colors"
+                    >
+                      <td className="p-6 font-medium">{row.country}</td>
+                      <td className="p-6 text-slate-400">{row.chip}</td>
+                      <td className="p-6 text-slate-400">{row.rabies}</td>
+                      <td className="p-6 text-slate-400">{row.titre}</td>
+                      <td className="p-6 text-slate-400">{row.cert}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <Link
+              href="/requirements"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-full transition-all shadow-lg shadow-sky-500/30"
+            >
+              <Globe size={18} />
+              View Full 57+ Country Requirements
+            </Link>
+          </div>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {AIRLINES.map((airline) => (
+              <div
+                key={airline.name}
+                className="bg-slate-800 p-6 rounded-2xl border border-slate-700"
+              >
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  {"\u2708\uFE0F"} {airline.name}
+                </h4>
+                <p className="text-sm text-slate-400">{airline.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* TESTIMONIAL MARQUEE — Continuous scroll quotes */}
       <section className="py-12 bg-slate-900 overflow-hidden">
         <ScrollMarquee duration={50} pauseOnHover>
@@ -800,11 +942,11 @@ export default function FlyMyPetLanding() {
         <div className="max-w-7xl mx-auto text-center">
           <Heart size={48} className="text-rose-400 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4 text-slate-900">
-            Help Solve the GCC Pet Crisis
+            Sponsor a Rescue Flight
           </h2>
           <p className="text-slate-600 max-w-2xl mx-auto mb-12">
-            Hundreds of abandoned pets in the UAE have adoptive homes waiting in
-            Europe, but they lack the funds for flights. You can sponsor a
+            If you&apos;re relocating your own pet, start above. If you want to
+            help abandoned animals reach adoptive homes in Europe, sponsor a
             &ldquo;flight buddy&rdquo; directly.
           </p>
 
@@ -816,7 +958,7 @@ export default function FlyMyPetLanding() {
               >
                 <div className="w-full h-32 bg-slate-100 rounded-xl mb-4 overflow-hidden">
                   <img
-                    src={pet.image}
+                    src={`${BASE_PATH}${pet.image}`}
                     alt={pet.name}
                     className="w-full h-full object-cover"
                   />
@@ -849,73 +991,6 @@ export default function FlyMyPetLanding() {
             <Heart size={20} />
             Support a Rescue on Telegram
           </a>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section id="testimonials" className="py-24 bg-white px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Trusted by Pet Owners Across the UAE
-            </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              Real stories from families who successfully relocated their pets
-              to Europe with our help.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-8"
-          >
-            {TESTIMONIALS.map((t, i) => (
-              <motion.div
-                key={i}
-                variants={fadeIn}
-                className="bg-slate-50 rounded-3xl p-8 relative"
-              >
-                <Quote
-                  size={40}
-                  className="text-sky-100 absolute top-6 right-6"
-                />
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star
-                      key={j}
-                      size={16}
-                      className="fill-amber-400 text-amber-400"
-                    />
-                  ))}
-                </div>
-                <p className="text-slate-700 leading-relaxed mb-6 relative z-10">
-                  &ldquo;{t.text}&rdquo;
-                </p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-slate-900">{t.name}</p>
-                    <p className="text-sm text-slate-500">{t.pet}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-sky-600 flex items-center gap-1">
-                      <Plane size={14} />
-                      {t.location}
-                    </p>
-                    <p className="text-xs text-slate-400">{t.date}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </section>
 
@@ -1007,8 +1082,10 @@ export default function FlyMyPetLanding() {
         </div>
       </section>
 
+      <StickyCTA />
+
       {/* FOOTER */}
-      <footer className="bg-slate-900 text-slate-400 py-12 px-6 text-sm">
+      <footer className="bg-slate-900 text-slate-400 py-12 px-6 text-sm pb-24 md:pb-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2 text-white">
             <span className="text-xl">{"\u{1F43E}"}</span>

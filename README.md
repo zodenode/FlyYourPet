@@ -277,12 +277,28 @@ npx prisma migrate deploy
 
 Optimized for deployment on Vercel (website + API) with a managed PostgreSQL provider (Neon, Supabase, Railway).
 
+### GitHub Pages (Static Landing Only)
+
+The marketing site (landing, how-it-works, pricing, rescue, requirements) can be deployed as a static export to GitHub Pages:
+
+1. **Enable GitHub Pages** in repo Settings → Pages → Source: GitHub Actions.
+2. Push to `main` (or `master`). The `.github/workflows/deploy-gh-pages.yml` workflow builds the static export and deploys to `https://<user>.github.io/flymypet/`.
+
+**Build locally:**
+```bash
+npm run build:static
+# Output in ./out — deploy to any static host
+```
+
+*Note: API routes and admin panel are excluded from the static build. Use Vercel or similar for the full app.*
+
 ## Scripts
 
 | Script | Description |
 |---|---|
 | `npm run dev` | Start Next.js dev server |
 | `npm run build` | Production build |
+| `npm run build:static` | Static export for GitHub Pages (excludes API/admin) |
 | `npm run bot:dev` | Start Telegram bot (watch mode) |
 | `npm run bot` | Start Telegram bot (production) |
 | `npm run webhook:set` | Set Telegram webhook (requires WEBHOOK_URL in .env or URL as arg) |
