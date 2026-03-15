@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String?
+  email      String?
+  telegramId String?  @unique @map("telegram_id")
+  city       String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  pets         Pet[]
+  onboardState OnboardState?
+
+  @@map("users")
+}
+
+model Pet {
+  id        String  @id @default(cuid())
+  ownerId   String  @map("owner_id")
+  type      String  @default("cat")
+  breed     String?
+  age       String?
+  weight    String?
+  microchip String?
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  relocations Relocation[]
+  documents   Document[]
+
+  @@map("pets")
+}
+
+enum RelocationStatus {
+  submitted
+  documents_pending
+  vet_verification
+  flight_matching
+  confirmed
+  in_transit
+  delivered
+  cancelled
+}
+
+model Relocation {
+  id          String           @id @default(cuid())
+  petId       String           @map("pet_id")
+  origin      String
+  destination String
+  travelDate  DateTime?        @map("travel_date")
+  flexDates   Boolean          @default(false) @map("flex_dates")
+  status      RelocationStatus @default(submitted)
+  package     String?
+  notes       String?
+  flightId    String?          @map("flight_id")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  pet    Pet     @relation(fields: [petId], references: [id], onDelete: Cascade)
+  flight Flight? @relation(fields: [flightId], references: [id])
+
+  @@map("relocations")
+}
+
+enum DocumentType {
+  vaccination_card
+  rabies_certificate
+  pet_passport
+  owner_id
+  other
+}
+
+model Document {
+  id       String       @id @default(cuid())
+  petId    String       @map("pet_id")
+  fileUrl  String       @map("file_url")
+  fileId   String?      @map("file_id")
+  type     DocumentType
+  approved Boolean      @default(false)
+  uploadedAt DateTime   @default(now()) @map("uploaded_at")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Flight {
+  id          String   @id @default(cuid())
+  route       String
+  date        DateTime
+  airline     String?
+  volunteerId String?  @map("volunteer_id")
+  capacity    Int      @default(1)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  volunteer   Volunteer?   @relation(fields: [volunteerId], references: [id])
+  relocations Relocation[]
+
+  @@map("flights")
+}
+
+model Volunteer {
+  id         String   @id @default(cuid())
+  name       String
+  telegramId String?  @map("telegram_id")
+  phone      String?
+  email      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  flights Flight[]
+
+  @@map("volunteers")
+}
+
+model Sponsorship {
+  id        String   @id @default(cuid())
+  donorName String?  @map("donor_name")
+  donorEmail String? @map("donor_email")
+  amount    Float
+  currency  String   @default("EUR")
+  petName   String?  @map("pet_name")
+  paymentId String?  @map("payment_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("sponsorships")
+}
+
+enum OnboardStep {
+  start
+  owner_name
+  owner_phone
+  owner_email
+  owner_city
+  pet_type
+  pet_breed
+  pet_age
+  pet_weight
+  pet_microchip
+  travel_origin
+  travel_destination
+  travel_date
+  travel_flex
+  documents
+  complete
+}
+
+model OnboardState {
+  id         String     @id @default(cuid())
+  userId     String     @unique @map("user_id")
+  step       OnboardStep @default(start)
+  petId      String?    @map("pet_id")
+  relocationId String?  @map("relocation_id")
+  docCount   Int        @default(0) @map("doc_count")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("onboard_states")
+}

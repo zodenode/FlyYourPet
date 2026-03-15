@@ -1,0 +1,30 @@
+{"sessionId":"8a4225","location":"webhook/route.ts:POST","message":"Webhook request received","data":{"hasSecret":false,"envSecretSet":false},"timestamp":1773515409832,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:beforeHandle","message":"Update received, dispatching to bot","data":{"updateType":"text","isStart":true,"hasUpdateId":true},"timestamp":1773515409835,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:entry","message":"/start handler entered","data":{"telegramId":"991331068"},"timestamp":1773515410257,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:beforeReply","message":"About to send welcome reply","data":{},"timestamp":1773515410326,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:afterReply","message":"Welcome reply sent successfully","data":{},"timestamp":1773515410412,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:afterHandle","message":"Bot handleUpdate completed","data":{"isStart":true},"timestamp":1773515410413,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:POST","message":"Webhook request received","data":{"hasSecret":false,"envSecretSet":false},"timestamp":1773515655699,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:beforeHandle","message":"Update received, dispatching to bot","data":{"updateType":"text","isStart":true,"hasUpdateId":true},"timestamp":1773515655705,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:entry","message":"/start handler entered","data":{"telegramId":"8089001568"},"timestamp":1773515655706,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:beforeReply","message":"About to send welcome reply","data":{},"timestamp":1773515655728,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:afterReply","message":"Welcome reply sent successfully","data":{},"timestamp":1773515655825,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:afterHandle","message":"Bot handleUpdate completed","data":{"isStart":true},"timestamp":1773515655826,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:POST","message":"Webhook request received","data":{"hasSecret":false,"envSecretSet":false},"timestamp":1773515677116,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:beforeHandle","message":"Update received, dispatching to bot","data":{"updateType":"text","isStart":false,"hasUpdateId":true},"timestamp":1773515677119,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:afterHandle","message":"Bot handleUpdate completed","data":{"isStart":false},"timestamp":1773515677245,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:POST","message":"Webhook request received","data":{"hasSecret":false,"envSecretSet":false},"timestamp":1773516018518,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:beforeHandle","message":"Update received, dispatching to bot","data":{"updateType":"text","isStart":false,"hasUpdateId":true},"timestamp":1773516018521,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:afterHandle","message":"Bot handleUpdate completed","data":{"isStart":false},"timestamp":1773516018646,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:POST","message":"Webhook request received","data":{"hasSecret":false,"envSecretSet":false},"timestamp":1773516023497,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:beforeHandle","message":"Update received, dispatching to bot","data":{"updateType":"contact","isStart":false,"hasUpdateId":true},"timestamp":1773516023500,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:afterHandle","message":"Bot handleUpdate completed","data":{"isStart":false},"timestamp":1773516023587,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:POST","message":"Webhook request received","data":{"hasSecret":false,"envSecretSet":false},"timestamp":1773516050411,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:beforeHandle","message":"Update received, dispatching to bot","data":{"updateType":"text","isStart":false,"hasUpdateId":true},"timestamp":1773516050414,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:afterHandle","message":"Bot handleUpdate completed","data":{"isStart":false},"timestamp":1773516050531,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:POST","message":"Webhook request received","data":{"hasSecret":false,"envSecretSet":false},"timestamp":1773571579945,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:beforeHandle","message":"Update received, dispatching to bot","data":{"updateType":"text","isStart":true,"hasUpdateId":true},"timestamp":1773571579947,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:entry","message":"/start handler entered","data":{"telegramId":"8089001568"},"timestamp":1773571580235,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:beforeReply","message":"About to send welcome reply","data":{},"timestamp":1773571580288,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"bot/index.ts:start:afterReply","message":"Welcome reply sent successfully","data":{},"timestamp":1773571580441,"hypothesisId":"H1"}
+{"sessionId":"8a4225","location":"webhook/route.ts:afterHandle","message":"Bot handleUpdate completed","data":{"isStart":true},"timestamp":1773571580442,"hypothesisId":"H1"}
