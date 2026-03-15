@@ -25,7 +25,7 @@ export default async function CustomersPage({
           { email: { contains: query, mode: "insensitive" as const } },
           { phone: { contains: query, mode: "insensitive" as const } },
           { telegramId: { contains: query, mode: "insensitive" as const } },
-          { city: { contains: query, mode: "insensitive" as const } },
+          { origin: { contains: query, mode: "insensitive" as const } },
         ],
       }
     : {};
@@ -97,7 +97,7 @@ export default async function CustomersPage({
               <tr>
                 <th className="text-left px-5 py-3 font-medium text-slate-500">Customer</th>
                 <th className="text-left px-5 py-3 font-medium text-slate-500">Contact</th>
-                <th className="text-left px-5 py-3 font-medium text-slate-500">City</th>
+                <th className="text-left px-5 py-3 font-medium text-slate-500">From</th>
                 <th className="text-left px-5 py-3 font-medium text-slate-500">Telegram ID</th>
                 <th className="text-left px-5 py-3 font-medium text-slate-500">Pets</th>
                 <th className="text-left px-5 py-3 font-medium text-slate-500">Docs</th>
@@ -127,7 +127,7 @@ export default async function CustomersPage({
                       <div className="text-slate-700">{c.email || "—"}</div>
                       <div className="text-xs text-slate-400">{c.phone || ""}</div>
                     </td>
-                    <td className="px-5 py-4 text-slate-600">{c.city || "—"}</td>
+                    <td className="px-5 py-4 text-slate-600">{c.origin || "—"}</td>
                     <td className="px-5 py-4">
                       <code className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">
                         {c.telegramId || "—"}

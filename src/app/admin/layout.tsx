@@ -10,6 +10,7 @@ import {
   HandHeart,
   PawPrint,
   ArrowLeft,
+  Banknote,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/documents", label: "Documents", icon: FileText },
   { href: "/admin/relocations", label: "Relocations", icon: PawPrint },
+  { href: "/admin/pricing", label: "Pricing", icon: Banknote },
   { href: "/admin/flights", label: "Flights", icon: Plane },
   { href: "/admin/volunteers", label: "Volunteers", icon: HandHeart },
 ];

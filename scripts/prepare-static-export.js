@@ -14,10 +14,13 @@ const TMP_API = path.join(APP, "_api.bak");
 const TMP_ADMIN = path.join(APP, "_admin.bak");
 
 function move(src, dest) {
-  if (fs.existsSync(src)) {
-    fs.renameSync(src, dest);
-    console.log(`Moved ${path.basename(src)} -> ${path.basename(dest)}`);
+  if (!fs.existsSync(src)) return;
+  if (fs.existsSync(dest)) {
+    fs.rmSync(dest, { recursive: true });
+    console.log(`Removed existing ${path.basename(dest)}`);
   }
+  fs.renameSync(src, dest);
+  console.log(`Moved ${path.basename(src)} -> ${path.basename(dest)}`);
 }
 
 const mode = process.argv[2] || "backup"; // backup | restore

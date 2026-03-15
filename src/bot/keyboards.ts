@@ -144,15 +144,13 @@ export const KEYBOARDS = {
       locale
     ),
 
-  /** Owner city */
-  ownerCity: (locale: Locale) =>
+  /** Region: UAE gates from/to collection */
+  ownerRegion: (locale: Locale) =>
     stepButtons(
-      "owner_city",
+      "owner_region",
       [
-        { label: "🇦🇪 Dubai", value: "Dubai" },
-        { label: "🇦🇪 Abu Dhabi", value: "Abu Dhabi" },
-        { label: "🇦🇪 Sharjah", value: "Sharjah" },
-        { label: "🇦🇪 Other", value: "other" },
+        { label: "🇦🇪 UAE", value: "UAE" },
+        { label: "Other", value: "other" },
       ],
       locale
     ),
@@ -172,8 +170,12 @@ export const KEYBOARDS = {
   forStep: (step: OnboardStep, petType?: string, locale?: Locale) => {
     const loc = locale ?? ("en" as Locale);
     switch (step) {
-      case "owner_city":
-        return KEYBOARDS.ownerCity(loc);
+      case "owner_region":
+        return KEYBOARDS.ownerRegion(loc);
+      case "travel_origin":
+        return KEYBOARDS.origin(loc);
+      case "travel_destination":
+        return KEYBOARDS.destination(loc);
       case "pet_type":
         return KEYBOARDS.petType(loc);
       case "pet_breed":
@@ -184,10 +186,6 @@ export const KEYBOARDS = {
         return KEYBOARDS.petWeight(loc);
       case "pet_microchip":
         return KEYBOARDS.petMicrochip(loc);
-      case "travel_origin":
-        return KEYBOARDS.origin(loc);
-      case "travel_destination":
-        return KEYBOARDS.destination(loc);
       case "travel_date":
         return KEYBOARDS.travelDate(loc);
       case "travel_flex":

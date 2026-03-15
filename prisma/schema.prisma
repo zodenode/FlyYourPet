@@ -13,7 +13,9 @@ model User {
   phone      String?
   email      String?
   telegramId String?  @unique @map("telegram_id")
-  city       String?
+  region     String?  // UAE | other — gates from/to collection
+  origin     String?  // From (UAE city) — used when region=UAE
+  destination String? // To (country) — used when region=UAE
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -140,7 +142,7 @@ enum OnboardStep {
   owner_name
   owner_phone
   owner_email
-  owner_city
+  owner_region
   pet_type
   pet_breed
   pet_age

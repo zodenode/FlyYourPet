@@ -181,7 +181,7 @@ Website (flymypet.com)
 
 The bot guides users through a step-by-step conversation. Each response is validated and saved to the database in real-time. The `onboard_states` table tracks where each user is in the flow.
 
-Steps: `owner_name` → `owner_phone` → `owner_email` → `owner_city` → `pet_type` → `pet_breed` → `pet_age` → `pet_weight` → `pet_microchip` → `travel_origin` → `travel_destination` → `travel_date` → `travel_flex` → `documents` → `complete`
+Steps: `owner_name` → `owner_phone` → `owner_email` → `owner_region` (UAE only) → `travel_origin` → `travel_destination` → `pet_type` → … → `travel_date` → `travel_flex` → `documents` → `complete`
 
 ### Document Upload
 
@@ -281,8 +281,9 @@ Optimized for deployment on Vercel (website + API) with a managed PostgreSQL pro
 
 The marketing site (landing, how-it-works, pricing, rescue, requirements) can be deployed as a static export to GitHub Pages:
 
-1. **Enable GitHub Pages** in repo Settings → Pages → Source: GitHub Actions.
-2. Push to `main` (or `master`). The `.github/workflows/deploy-gh-pages.yml` workflow builds the static export and deploys to `https://<user>.github.io/flymypet/`.
+1. **Enable GitHub Pages** in repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Push to `main` (or `master`). The `.github/workflows/deploy-gh-pages.yml` workflow builds and deploys automatically.
+3. Site will be live at `https://<username>.github.io/flymypet/`.
 
 **Build locally:**
 ```bash
@@ -290,7 +291,9 @@ npm run build:static
 # Output in ./out — deploy to any static host
 ```
 
-*Note: API routes and admin panel are excluded from the static build. Use Vercel or similar for the full app.*
+**If your repo has a different name:** Update `basePath` in `next.config.ts` (e.g. `"/your-repo-name"`).
+
+*Note: API routes and admin panel are excluded from the static build. Use Vercel or similar for the full app with the bot webhook.*
 
 ## Scripts
 
@@ -303,6 +306,7 @@ npm run build:static
 | `npm run bot` | Start Telegram bot (production) |
 | `npm run webhook:set` | Set Telegram webhook (requires WEBHOOK_URL in .env or URL as arg) |
 | `npm run webhook:get` | Show current webhook URL |
+| `npm run bot:profile` | Set bot profile photo from `public/bot-avatar.png` |
 | `npm run db:push` | Push schema to database |
 | `npm run db:migrate` | Run migrations |
 | `npm run db:seed` | Seed sample data |

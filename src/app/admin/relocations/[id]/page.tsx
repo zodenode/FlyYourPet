@@ -59,7 +59,7 @@ export default async function RelocationDetailPage({
               <Field label="Name" value={relocation.pet.owner.name} />
               <Field label="Phone" value={relocation.pet.owner.phone} />
               <Field label="Email" value={relocation.pet.owner.email} />
-              <Field label="City" value={relocation.pet.owner.city} />
+              <Field label="From" value={relocation.pet.owner.origin ?? relocation.origin} />
               <Field label="Telegram ID" value={relocation.pet.owner.telegramId} />
             </dl>
           </Card>

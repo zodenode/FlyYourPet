@@ -11,7 +11,7 @@ async function main() {
       phone: "+971 50 123 4567",
       email: "sarah@example.com",
       telegramId: "12345678",
-      city: "Dubai",
+      origin: "Dubai",
     },
   });
 
@@ -21,7 +21,7 @@ async function main() {
       phone: "+971 55 987 6543",
       email: "ahmed@example.com",
       telegramId: "87654321",
-      city: "Abu Dhabi",
+      origin: "Abu Dhabi",
     },
   });
 

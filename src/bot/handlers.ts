@@ -47,17 +47,16 @@ const STEP_KEYS: Record<
   owner_email: {
     field: "email",
     table: "user",
-    next: "owner_city",
-    promptKey: "bot.stepOwnerCity",
+    next: "owner_region",
+    promptKey: "bot.stepOwnerEmail",
     validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
     errorMsgKey: "bot.errorInvalidEmail",
   },
-  owner_city: {
-    field: "city",
+  owner_region: {
+    field: "region",
     table: "user",
-    next: "pet_type",
-    promptKey: "bot.stepOwnerCity",
-    customPromptKey: "bot.stepOwnerCityCustom",
+    next: "travel_origin",
+    promptKey: "bot.stepOwnerRegion",
   },
   pet_type: {
     field: "type",
@@ -87,7 +86,7 @@ const STEP_KEYS: Record<
   pet_microchip: {
     field: "microchip",
     table: "pet",
-    next: "travel_origin",
+    next: "travel_date",
     promptKey: "bot.stepPetMicrochip",
     customPromptKey: "bot.stepPetMicrochipCustom",
   },
@@ -101,7 +100,7 @@ const STEP_KEYS: Record<
   travel_destination: {
     field: "destination",
     table: "relocation",
-    next: "travel_date",
+    next: "pet_type",
     promptKey: "bot.stepTravelDestination",
   },
   travel_date: {
@@ -193,6 +192,14 @@ export async function handleCallback(ctx: CallbackContext) {
 
   const stepConfig = STEP_KEYS[step];
 
+  // owner_region: only UAE supported; "other" does not advance
+  if (step === "owner_region" && value === "other") {
+    await ctx.reply(t(locale, "bot.stepOwnerRegionOther"), {
+      parse_mode: PARSE_MODE,
+    });
+    return;
+  }
+
   // Values that require custom text input - don't advance, ask for text
   if (["other", "custom", "type"].includes(value)) {
     const customPromptKey = stepConfig.customPromptKey;
@@ -261,14 +268,38 @@ async function saveValueAndAdvance(
     }
   }
 
+  // travel_origin / travel_destination before pet: save to user
+  if (
+    (step === "travel_origin" || step === "travel_destination") &&
+    !state.petId
+  ) {
+    const userField = step === "travel_origin" ? "origin" : "destination";
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { [userField]: value },
+    });
+    const nextStep = stepConfig.next;
+    await prisma.onboardState.update({
+      where: { userId: user.id },
+      data: { step: nextStep },
+    });
+    await sendNextPrompt(ctx, user.id, nextStep, locale);
+    return;
+  }
+
   if (stepConfig.table === "relocation" && stepConfig.field) {
     let relocationId = state.relocationId;
     if (!relocationId) {
+      // Get origin/destination from user (collected before pet)
+      const u = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { origin: true, destination: true },
+      });
       const reloc = await prisma.relocation.create({
         data: {
           petId: state.petId!,
-          origin: String(value),
-          destination: "",
+          origin: u?.origin ?? String(value),
+          destination: u?.destination ?? "",
           status: "submitted",
         },
       });
@@ -277,6 +308,13 @@ async function saveValueAndAdvance(
         where: { userId: user.id },
         data: { relocationId },
       });
+      // If travel_date, also set notes (ASAP, this_month, etc.)
+      if (stepConfig.field === "travelDate" && notesValue) {
+        await prisma.relocation.update({
+          where: { id: relocationId },
+          data: { notes: notesValue, travelDate: null },
+        });
+      }
     } else {
       const updateData: Record<string, unknown> = {};
       if (stepConfig.field === "travelDate" && notesValue) {
@@ -432,14 +470,38 @@ export async function handleMessage(ctx: TextContext) {
     }
   }
 
+  // travel_origin / travel_destination before pet: save to user
+  if (
+    (state.step === "travel_origin" || state.step === "travel_destination") &&
+    !state.petId
+  ) {
+    const userField =
+      state.step === "travel_origin" ? "origin" : "destination";
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { [userField]: text },
+    });
+    const nextStep = stepConfig.next;
+    await prisma.onboardState.update({
+      where: { userId: user.id },
+      data: { step: nextStep },
+    });
+    await sendNextPrompt(ctx, user.id, nextStep, locale);
+    return;
+  }
+
   if (stepConfig.table === "relocation" && stepConfig.field) {
     let relocationId = state.relocationId;
     if (!relocationId) {
+      const u = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { origin: true, destination: true },
+      });
       const reloc = await prisma.relocation.create({
         data: {
           petId: state.petId!,
-          origin: text,
-          destination: "",
+          origin: u?.origin ?? text,
+          destination: u?.destination ?? "",
           status: "submitted",
         },
       });
@@ -448,6 +510,15 @@ export async function handleMessage(ctx: TextContext) {
         where: { userId: user.id },
         data: { relocationId },
       });
+      if (stepConfig.field === "travelDate") {
+        const parsed = parseTravelDate(text);
+        await prisma.relocation.update({
+          where: { id: reloc.id },
+          data: parsed
+            ? { travelDate: parsed, notes: null }
+            : { travelDate: null, notes: text },
+        });
+      }
     } else {
       let value: unknown = text;
       if (stepConfig.field === "flexDates") {
