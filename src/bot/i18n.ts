@@ -51,7 +51,7 @@ export function resolveLocale(languageCode?: string): Locale {
 }
 
 /**
- * Get a nested value from an object by dot path (e.g. "bot.welcome")
+ * Get a nested value from an object by dot path (e.g. "bot.welcomeTagline")
  */
 function getNested(obj: Record<string, unknown>, path: string): string | undefined {
   const parts = path.split(".");
@@ -78,7 +78,7 @@ function interpolate(
 
 /**
  * Get translated string for the bot. Uses locale from Telegram user.
- * Example: t("en", "bot.welcome") or t("ru", "bot.stepOwnerName", {})
+ * Example: t("en", "bot.welcomeTagline") or t("ru", "bot.stepOwnerName", {})
  */
 export function t(
   locale: Locale,

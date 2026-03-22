@@ -40,7 +40,7 @@ const STEP_KEYS: Record<
     field: "phone",
     table: "user",
     next: "owner_email",
-    promptKey: "bot.stepOwnerEmail",
+    promptKey: "bot.stepOwnerPhone",
     validate: (v) => /^\+?[\d\s-()]{7,}$/.test(v.trim()),
     errorMsgKey: "bot.errorInvalidPhone",
   },
@@ -120,8 +120,54 @@ const STEP_KEYS: Record<
   complete: { next: "complete", promptKey: "" },
 };
 
+function formatRelocationStatus(status: string, locale: Locale): string {
+  const keys: Record<string, string> = {
+    submitted: "bot.statusSubmitted",
+    documents_pending: "bot.statusDocumentsPending",
+    vet_verification: "bot.statusVetVerification",
+    flight_matching: "bot.statusFlightMatching",
+    confirmed: "bot.statusConfirmed",
+    in_transit: "bot.statusInTransit",
+    delivered: "bot.statusDelivered",
+    cancelled: "bot.statusCancelled",
+  };
+  const key = keys[status];
+  return key ? t(locale, key) : status;
+}
+
+/** Reply with the user's relocation summary (shared by /status and menu button). */
+export async function replyWithRelocationStatus(ctx: Context, locale: Locale) {
+  const telegramId = String(ctx.from!.id);
+  const user = await prisma.user.findUnique({
+    where: { telegramId },
+    include: {
+      pets: {
+        include: {
+          relocations: { orderBy: { createdAt: "desc" }, take: 1 },
+        },
+      },
+    },
+  });
+
+  if (!user || user.pets.length === 0) {
+    await ctx.reply(t(locale, "bot.noRelocations"), { parse_mode: PARSE_MODE });
+    return;
+  }
+
+  const lines = user.pets.flatMap((pet) =>
+    pet.relocations.map(
+      (r) =>
+        `🐱 <b>${pet.breed || "Cat"}</b> — ${r.origin} → ${r.destination}\n` +
+        `<i>Status:</i> ${formatRelocationStatus(r.status, locale)}`
+    )
+  );
+
+  const header = t(locale, "bot.yourRelocations");
+  await ctx.reply(`${header}\n\n${lines.join("\n\n")}`, { parse_mode: PARSE_MODE });
+}
+
 /** Send next step prompt with keyboard (if applicable) */
-async function sendNextPrompt(
+export async function sendNextPrompt(
   ctx: Context,
   userId: string,
   nextStep: OnboardStep,
@@ -162,10 +208,59 @@ export async function handleCallback(ctx: CallbackContext) {
   const telegramId = String(ctx.from!.id);
   const locale = resolveLocale(ctx.from?.language_code);
 
-  await ctx.answerCbQuery().catch(() => {});
-
   const user = await prisma.user.findUnique({ where: { telegramId } });
-  if (!user) return;
+  if (!user) {
+    await ctx.answerCbQuery().catch(() => {});
+    return;
+  }
+
+  if (data.startsWith("nav:")) {
+    const action = data.slice(4);
+    const state = await prisma.onboardState.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (action === "begin") {
+      if (!state) {
+        await ctx.answerCbQuery().catch(() => {});
+        return;
+      }
+      if (state.step === "complete") {
+        await ctx
+          .answerCbQuery(t(locale, "bot.errorUseStartShort"), {
+            show_alert: true,
+          })
+          .catch(() => {});
+        return;
+      }
+      await ctx.answerCbQuery().catch(() => {});
+      await sendNextPrompt(ctx, user.id, "owner_name", locale);
+      return;
+    }
+
+    if (action === "status") {
+      await ctx.answerCbQuery().catch(() => {});
+      await replyWithRelocationStatus(ctx, locale);
+      return;
+    }
+
+    if (action === "volunteer") {
+      await ctx.answerCbQuery().catch(() => {});
+      await ctx.reply(t(locale, "bot.volunteer"), { parse_mode: PARSE_MODE });
+      return;
+    }
+
+    if (action === "sponsor") {
+      await ctx.answerCbQuery().catch(() => {});
+      await ctx.reply(t(locale, "bot.sponsor"), { parse_mode: PARSE_MODE });
+      return;
+    }
+
+    await ctx.answerCbQuery().catch(() => {});
+    return;
+  }
+
+  await ctx.answerCbQuery().catch(() => {});
 
   const state = await prisma.onboardState.findUnique({
     where: { userId: user.id },
@@ -188,6 +283,22 @@ export async function handleCallback(ctx: CallbackContext) {
 
   const [, step, value] = match as [string, OnboardStep, string];
 
+  // #region agent log
+  if (step !== state.step) {
+    fetch("http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "ea1f85" },
+      body: JSON.stringify({
+        sessionId: "ea1f85",
+        location: "handlers.ts:handleCallback:stepMismatch",
+        message: "Callback ignored - step mismatch",
+        data: { callbackStep: step, stateStep: state.step, value },
+        timestamp: Date.now(),
+        hypothesisId: "H3",
+      }),
+    }).catch(() => {});
+  }
+  // #endregion
   if (step !== state.step) return;
 
   const stepConfig = STEP_KEYS[step];
@@ -332,6 +443,20 @@ async function saveValueAndAdvance(
   }
 
   const nextStep = stepConfig.next;
+  // #region agent log
+  fetch("http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "ea1f85" },
+    body: JSON.stringify({
+      sessionId: "ea1f85",
+      location: "handlers.ts:saveValueAndAdvance",
+      message: "Advancing step",
+      data: { fromStep: step, toStep: nextStep, value: String(value).slice(0, 50) },
+      timestamp: Date.now(),
+      hypothesisId: "H1,H4",
+    }),
+  }).catch(() => {});
+  // #endregion
   await prisma.onboardState.update({
     where: { userId: user.id },
     data: { step: nextStep },
@@ -384,6 +509,20 @@ export async function handleMessage(ctx: TextContext) {
   const state = await prisma.onboardState.findUnique({
     where: { userId: user.id },
   });
+  // #region agent log
+  fetch("http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "ea1f85" },
+    body: JSON.stringify({
+      sessionId: "ea1f85",
+      location: "handlers.ts:handleMessage:entry",
+      message: "handleMessage received",
+      data: { telegramId, text: text.slice(0, 50), stateStep: state?.step },
+      timestamp: Date.now(),
+      hypothesisId: "H1,H3,H4,H5",
+    }),
+  }).catch(() => {});
+  // #endregion
   if (!state) {
     await ctx.reply(t(locale, "bot.errorUseStart"), {
       parse_mode: PARSE_MODE,
@@ -431,6 +570,24 @@ export async function handleMessage(ctx: TextContext) {
   if (!stepConfig) return;
 
   if (stepConfig.validate && !stepConfig.validate(text)) {
+    // #region agent log
+    fetch("http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "ea1f85" },
+      body: JSON.stringify({
+        sessionId: "ea1f85",
+        location: "handlers.ts:handleMessage:validationFailed",
+        message: "Validation failed, sending error",
+        data: {
+          stateStep: state.step,
+          text,
+          errorMsgKey: stepConfig.errorMsgKey,
+        },
+        timestamp: Date.now(),
+        hypothesisId: "H1,H5",
+      }),
+    }).catch(() => {});
+    // #endregion
     const errorMsg = stepConfig.errorMsgKey
       ? t(locale, stepConfig.errorMsgKey)
       : t(locale, "bot.errorInvalidInput");

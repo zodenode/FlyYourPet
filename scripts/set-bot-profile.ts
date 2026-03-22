@@ -3,6 +3,7 @@
  *
  * Requires: Bot API 9.4+ (Feb 2026) for setMyProfilePhoto.
  * Uses public/bot-avatar.png - convert to JPG if the API rejects PNG.
+ * The /start greeting uses public/bot-welcome.png (replace with your hero art).
  *
  * Usage:
  *   npm run bot:profile

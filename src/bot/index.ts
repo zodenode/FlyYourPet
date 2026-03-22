@@ -1,4 +1,6 @@
-import { Telegraf } from "telegraf";
+import { existsSync } from "fs";
+import { join } from "path";
+import { Input, Telegraf } from "telegraf";
 import { prisma } from "@/lib/prisma";
 import {
   handleMessage,
@@ -6,8 +8,10 @@ import {
   handlePhoto,
   handleCallback,
   handleContact,
+  replyWithRelocationStatus,
 } from "./handlers";
-import { t, resolveLocale, type Locale } from "./i18n";
+import { startScreenKeyboard } from "./keyboards";
+import { t, resolveLocale } from "./i18n";
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -28,32 +32,13 @@ async function configureBotProfile() {
 }
 
 bot.start(async (ctx) => {
-  // #region agent log
-  fetch("http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "8a4225",
-    },
-    body: JSON.stringify({
-      sessionId: "8a4225",
-      location: "bot/index.ts:start:entry",
-      message: "/start handler entered",
-      data: { telegramId: String(ctx.from.id) },
-      timestamp: Date.now(),
-      hypothesisId: "H1",
-    }),
-  }).catch(() => {});
-  // #endregion
-
   const telegramId = String(ctx.from.id);
   const name = [ctx.from.first_name, ctx.from.last_name]
     .filter(Boolean)
     .join(" ");
 
-  let user;
   try {
-    user = await prisma.user.findUnique({ where: { telegramId } });
+    let user = await prisma.user.findUnique({ where: { telegramId } });
 
     if (!user) {
       user = await prisma.user.create({
@@ -66,7 +51,7 @@ bot.start(async (ctx) => {
     });
 
     if (!state) {
-      state = await prisma.onboardState.create({
+      await prisma.onboardState.create({
         data: { userId: user.id, step: "owner_name" },
       });
     } else {
@@ -81,126 +66,32 @@ bot.start(async (ctx) => {
       });
     }
   } catch (dbErr) {
-    // #region agent log
-    fetch(
-      "http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "8a4225",
-        },
-        body: JSON.stringify({
-          sessionId: "8a4225",
-          location: "bot/index.ts:start:dbError",
-          message: "DB error in /start",
-          data: {
-            err: dbErr instanceof Error ? dbErr.message : String(dbErr),
-          },
-          timestamp: Date.now(),
-          hypothesisId: "H3",
-        }),
-      }
-    ).catch(() => {});
-    // #endregion
     throw dbErr;
   }
 
-  // #region agent log
-  fetch("http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "8a4225",
-    },
-    body: JSON.stringify({
-      sessionId: "8a4225",
-      location: "bot/index.ts:start:beforeReply",
-      message: "About to send welcome reply",
-      data: {},
-      timestamp: Date.now(),
-      hypothesisId: "H1",
-    }),
-  }).catch(() => {});
-  // #endregion
-
   const locale = resolveLocale(ctx.from?.language_code);
-  try {
-    await ctx.reply(t(locale, "bot.welcome"), { parse_mode: "HTML" });
-  } catch (replyErr) {
-    // #region agent log
-    fetch(
-      "http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "8a4225",
-        },
-        body: JSON.stringify({
-          sessionId: "8a4225",
-          location: "bot/index.ts:start:replyError",
-          message: "Reply error in /start (likely MarkdownV2 parse)",
-          data: {
-            err: replyErr instanceof Error ? replyErr.message : String(replyErr),
-          },
-          timestamp: Date.now(),
-          hypothesisId: "H2",
-        }),
-      }
-    ).catch(() => {});
-    // #endregion
-    throw replyErr;
+  const welcomePath = join(process.cwd(), "public", "bot-welcome.png");
+  const keyboard = startScreenKeyboard(locale);
+
+  if (existsSync(welcomePath)) {
+    await ctx.replyWithPhoto(Input.fromLocalFile(welcomePath), {
+      caption: t(locale, "bot.welcomeTagline"),
+      parse_mode: "HTML",
+      reply_markup: keyboard.reply_markup,
+    });
+  } else {
+    await ctx.reply(t(locale, "bot.welcomeTagline"), {
+      parse_mode: "HTML",
+      reply_markup: keyboard.reply_markup,
+    });
   }
 
-  // #region agent log
-  fetch("http://127.0.0.1:7573/ingest/6eab789b-828a-4324-a49e-e5cb18f727f9", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "8a4225",
-    },
-    body: JSON.stringify({
-      sessionId: "8a4225",
-      location: "bot/index.ts:start:afterReply",
-      message: "Welcome reply sent successfully",
-      data: {},
-      timestamp: Date.now(),
-      hypothesisId: "H1",
-    }),
-  }).catch(() => {});
-  // #endregion
+  await ctx.reply(t(locale, "bot.welcomeFollowUp"), { parse_mode: "HTML" });
 });
 
 bot.command("status", async (ctx) => {
-  const telegramId = String(ctx.from.id);
-  const user = await prisma.user.findUnique({
-    where: { telegramId },
-    include: {
-      pets: {
-        include: {
-          relocations: { orderBy: { createdAt: "desc" }, take: 1 },
-        },
-      },
-    },
-  });
-
   const locale = resolveLocale(ctx.from?.language_code);
-  if (!user || user.pets.length === 0) {
-    await ctx.reply(t(locale, "bot.noRelocations"), { parse_mode: "HTML" });
-    return;
-  }
-
-  const lines = user.pets.flatMap((pet) =>
-    pet.relocations.map(
-      (r) =>
-        `🐱 <b>${pet.breed || "Cat"}</b> — ${r.origin} → ${r.destination}\n` +
-        `<i>Status:</i> ${formatStatus(r.status, locale)}`
-    )
-  );
-
-  const header = t(locale, "bot.yourRelocations");
-  await ctx.reply(`${header}\n\n${lines.join("\n\n")}`, { parse_mode: "HTML" });
+  await replyWithRelocationStatus(ctx, locale);
 });
 
 bot.command("volunteer", async (ctx) => {
@@ -237,21 +128,6 @@ bot.on("text", async (ctx) => {
 bot.catch((err) => {
   console.error("Bot error:", err);
 });
-
-function formatStatus(status: string, locale: Locale): string {
-  const keys: Record<string, string> = {
-    submitted: "bot.statusSubmitted",
-    documents_pending: "bot.statusDocumentsPending",
-    vet_verification: "bot.statusVetVerification",
-    flight_matching: "bot.statusFlightMatching",
-    confirmed: "bot.statusConfirmed",
-    in_transit: "bot.statusInTransit",
-    delivered: "bot.statusDelivered",
-    cancelled: "bot.statusCancelled",
-  };
-  const key = keys[status];
-  return key ? t(locale, key) : status;
-}
 
 // Run in polling mode when executed directly
 if (require.main === module) {

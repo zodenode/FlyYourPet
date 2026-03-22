@@ -1,5 +1,6 @@
 import { Markup } from "telegraf";
 import type { OnboardStep } from "@prisma/client";
+import { SITE_URL, TELEGRAM_SUPPORT_USERNAME } from "@/lib/constants";
 import { t, type Locale } from "./i18n";
 
 /** Build inline keyboard for step selection. Callback format: s:step:value */
@@ -222,6 +223,52 @@ export const KEYBOARDS = {
       ],
     ]),
 } as const;
+
+/** Inline keyboard on /start: quick links + onboarding */
+export function startScreenKeyboard(locale: Locale) {
+  const supportUser = TELEGRAM_SUPPORT_USERNAME?.replace(/^@/, "");
+  const rowUrl: ReturnType<typeof Markup.button.url>[] = [
+    Markup.button.url(t(locale, "bot.keyboardWebsite"), SITE_URL),
+    Markup.button.url(t(locale, "bot.keyboardPricing"), `${SITE_URL}/pricing`),
+  ];
+  if (supportUser) {
+    rowUrl.push(
+      Markup.button.url(
+        t(locale, "bot.keyboardContactSupport"),
+        `https://t.me/${supportUser}`
+      )
+    );
+  }
+  return Markup.inlineKeyboard([
+    [
+      Markup.button.callback(
+        t(locale, "bot.keyboardStartRequest"),
+        "nav:begin"
+      ),
+    ],
+    rowUrl,
+    [
+      Markup.button.url(
+        t(locale, "bot.keyboardHowItWorks"),
+        `${SITE_URL}/how-it-works`
+      ),
+      Markup.button.callback(
+        t(locale, "bot.keyboardMyStatus"),
+        "nav:status"
+      ),
+    ],
+    [
+      Markup.button.callback(
+        t(locale, "bot.keyboardVolunteer"),
+        "nav:volunteer"
+      ),
+      Markup.button.callback(
+        t(locale, "bot.keyboardSponsor"),
+        "nav:sponsor"
+      ),
+    ],
+  ]);
+}
 
 /** Reply keyboard with "Share Contact" for phone - one-time use */
 export function contactRequestKeyboard(locale: Locale = "en") {

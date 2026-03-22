@@ -1,6 +1,10 @@
 export const TELEGRAM_BOT_URL =
   process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || "https://t.me/FlyMyPetBot";
 
+/** Public site URL for bot menu links (pricing, support pages, etc.) */
+export const SITE_URL =
+  (process.env.NEXT_PUBLIC_APP_URL || "https://flymy.pet").replace(/\/$/, "");
+
 /**
  * Human support contact for the escape hatch (help/urgent).
  * Use a real person's Telegram @username, NOT a bot.
